@@ -10,8 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MessageSquare, Copy, Check, Sparkles } from "lucide-react";
+import { MessageSquare, Copy, Check, Sparkles, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { shareToWhatsApp } from "@/lib/share";
 
 const messageTemplates = {
   "payment-reminder": {
@@ -155,15 +156,26 @@ export default function Messages() {
           <div className="card-elevated lg:sticky lg:top-24 h-fit">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-semibold text-foreground">Generated Message</h2>
-              {generatedMessage && (
-                <Button variant="outline" size="sm" onClick={handleCopy}>
-                  {copied ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                  {copied ? "Copied!" : "Copy"}
-                </Button>
+            {generatedMessage && (
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => shareToWhatsApp(generatedMessage)}
+                    className="text-green-600 border-green-600 hover:bg-green-50"
+                  >
+                    <Share2 className="h-4 w-4" />
+                    WhatsApp
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleCopy}>
+                    {copied ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                    {copied ? "Copied!" : "Copy"}
+                  </Button>
+                </div>
               )}
             </div>
 
