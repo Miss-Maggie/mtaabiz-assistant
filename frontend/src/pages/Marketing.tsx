@@ -10,8 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Megaphone, Copy, Check, Sparkles, Instagram, MessageCircle, Facebook } from "lucide-react";
+import { Megaphone, Copy, Check, Sparkles, Instagram, MessageCircle, Facebook, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { shareToWhatsApp } from "@/lib/share";
 
 const captionTemplates = {
   instagram: {
@@ -195,14 +196,25 @@ export default function Marketing() {
                 )}
               </div>
               {generatedCaption && (
-                <Button variant="outline" size="sm" onClick={handleCopy}>
-                  {copied ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                  {copied ? "Copied!" : "Copy"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => shareToWhatsApp(generatedCaption)}
+                    className="text-green-600 border-green-600 hover:bg-green-50"
+                  >
+                    <Share2 className="h-4 w-4" />
+                    WhatsApp
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleCopy}>
+                    {copied ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                    {copied ? "Copied!" : "Copy"}
+                  </Button>
+                </div>
               )}
             </div>
 
