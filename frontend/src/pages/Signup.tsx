@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { api } from '@/lib/api';
 import { z } from 'zod';
 import { Leaf, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -40,7 +41,7 @@ export default function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   const { signup } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -70,12 +71,13 @@ export default function Signup() {
 
     setIsLoading(true);
     try {
-      await signup(formData.username, formData.email, formData.password);
+      // Use api directly to avoid auto-login from context
+      await api.signup(formData.username, formData.email, formData.password);
       toast({
         title: 'Account created!',
-        description: 'Welcome to MtaaBiz AI.',
+        description: 'Please sign in with your new account.',
       });
-      navigate('/');
+      navigate('/login');
     } catch (error) {
       toast({
         title: 'Signup failed',
@@ -192,7 +194,7 @@ export default function Signup() {
 
             <Button
               type="submit"
-              variant="charcoal"
+              variant="default"
               className="w-full"
               disabled={isLoading}
             >

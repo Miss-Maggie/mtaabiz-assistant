@@ -2,9 +2,23 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
 import Invoice from "./pages/Invoice";
 import Messages from "./pages/Messages";
 import Marketing from "./pages/Marketing";
@@ -24,9 +38,30 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/invoice" element={<Invoice />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/marketing" element={<Marketing />} />
+            <Route
+              path="/invoice"
+              element={
+                <ProtectedRoute>
+                  <Invoice />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/messages"
+              element={
+                <ProtectedRoute>
+                  <Messages />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/marketing"
+              element={
+                <ProtectedRoute>
+                  <Marketing />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/registration" element={<Registration />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
