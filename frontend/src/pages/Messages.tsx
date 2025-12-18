@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { api } from "@/lib/api";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,6 +70,42 @@ export default function Messages() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const [savedMessages, setSavedMessages] = useState<any[]>([]);
+  const [showSaved, setShowSaved] = useState(false);
+
+  const handleSave = async () => {
+    if (!generatedMessage) return;
+
+    try {
+      await api.createMessage({
+        title: `${messageType} for ${clientName}`,
+        content: generatedMessage,
+        category: messageType === "payment-reminder" ? "REMINDER" : messageType === "follow-up" ? "FOLLOWUP" : "MARKETING"
+      });
+      toast({
+        title: "Saved!",
+        description: "Message template saved to your library.",
+      });
+      loadSavedMessages();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save message template.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const loadSavedMessages = async () => {
+    try {
+      const msgs = await api.getMessages();
+      setSavedMessages(msgs);
+      setShowSaved(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Layout>
       <div className="container py-10">
@@ -88,8 +125,13 @@ export default function Messages() {
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Form Section */}
           <div className="card-elevated">
-            <h2 className="text-lg font-semibold text-foreground mb-5">Message Settings</h2>
-            
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-semibold text-foreground">Message Settings</h2>
+              <Button variant="ghost" size="sm" onClick={loadSavedMessages}>
+                View Saved Library
+              </Button>
+            </div>
+
             <div className="space-y-5">
               <div>
                 <Label htmlFor="messageType" className="text-foreground">Message Type</Label>
@@ -155,12 +197,22 @@ export default function Messages() {
           {/* Output Section */}
           <div className="card-elevated lg:sticky lg:top-24 h-fit">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-semibold text-foreground">Generated Message</h2>
-            {generatedMessage && (
+              <h2 className="text-lg font-semibold text-foreground">
+                {showSaved ? "Saved Templates" : "Generated Message"}
+              </h2>
+              {generatedMessage && !showSaved && (
                 <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleSave}
+                    className="text-forest hover:text-forest-dark"
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => shareToWhatsApp(generatedMessage)}
                     className="text-green-600 border-green-600 hover:bg-green-50"
                   >
@@ -179,7 +231,34 @@ export default function Messages() {
               )}
             </div>
 
-            {generatedMessage ? (
+            {showSaved ? (
+              <div className="space-y-4">
+                {savedMessages.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-10">No saved messages yet.</p>
+                ) : (
+                  savedMessages.map((msg: any) => (
+                    <div key={msg.id} className="p-4 rounded-lg bg-muted/50 border border-border">
+                      <h3 className="font-semibold text-sm mb-2">{msg.title}</h3>
+                      <p className="text-sm text-foreground mb-3 line-clamp-3">{msg.content}</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => {
+                          setGeneratedMessage(msg.content);
+                          setShowSaved(false);
+                        }}
+                      >
+                        Use Template
+                      </Button>
+                    </div>
+                  ))
+                )}
+                <Button variant="ghost" className="w-full" onClick={() => setShowSaved(false)}>
+                  Back to Generator
+                </Button>
+              </div>
+            ) : generatedMessage ? (
               <div className="bg-muted/50 rounded-lg border border-border p-5">
                 <pre className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">
                   {generatedMessage}

@@ -15,6 +15,22 @@ interface ApiError {
   [key: string]: unknown;
 }
 
+interface Invoice {
+  id?: number;
+  client_name: string;
+  amount: number;
+  date_issued: string;
+  due_date: string;
+  status: 'PENDING' | 'PAID' | 'OVERDUE';
+}
+
+interface MessageTemplate {
+  id?: number;
+  title: string;
+  content: string;
+  category: 'MARKETING' | 'REMINDER' | 'FOLLOWUP';
+}
+
 class ApiClient {
   private baseUrl: string;
 
@@ -40,9 +56,9 @@ class ApiClient {
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const error: ApiError = await response.json().catch(() => ({}));
-      const message = 
-        error.detail || 
-        error.non_field_errors?.[0] || 
+      const message =
+        error.detail ||
+        error.non_field_errors?.[0] ||
         Object.values(error).flat().join(', ') ||
         'An error occurred';
       throw new Error(message);
@@ -85,7 +101,43 @@ class ApiClient {
     });
     return this.handleResponse<AuthResponse['user']>(response);
   }
+
+  // Invoice Endpoints
+  async getInvoices(): Promise<Invoice[]> {
+    const response = await fetch(`${this.baseUrl}/invoices/`, {
+      method: 'GET',
+      headers: this.getHeaders(true),
+    });
+    return this.handleResponse<Invoice[]>(response);
+  }
+
+  async createInvoice(data: Invoice): Promise<Invoice> {
+    const response = await fetch(`${this.baseUrl}/invoices/`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data),
+    });
+    return this.handleResponse<Invoice>(response);
+  }
+
+  // Message Endpoints
+  async getMessages(): Promise<MessageTemplate[]> {
+    const response = await fetch(`${this.baseUrl}/messages/`, {
+      method: 'GET',
+      headers: this.getHeaders(true),
+    });
+    return this.handleResponse<MessageTemplate[]>(response);
+  }
+
+  async createMessage(data: MessageTemplate): Promise<MessageTemplate> {
+    const response = await fetch(`${this.baseUrl}/messages/`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data),
+    });
+    return this.handleResponse<MessageTemplate>(response);
+  }
 }
 
 export const api = new ApiClient(API_BASE_URL);
-export type { AuthResponse, ApiError };
+export type { AuthResponse, ApiError, Invoice, MessageTemplate };
