@@ -31,9 +31,22 @@ export default function Invoice() {
   const invoiceNumber = useRef(`INV-${Date.now().toString().slice(-6)}`);
   const { toast } = useToast();
 
+  const [userStatus, setUserStatus] = useState({ is_pro: false, invoice_count: 0, limit: 5 });
+  const [isUpgrading, setIsUpgrading] = useState(false);
+
   useEffect(() => {
     loadInvoices();
+    loadStatus();
   }, []);
+
+  const loadStatus = async () => {
+    try {
+      const status = await api.getUserStatus();
+      setUserStatus(status);
+    } catch (error) {
+      console.error("Failed to load user status", error);
+    }
+  };
 
   const loadInvoices = async () => {
     try {
@@ -75,6 +88,28 @@ export default function Invoice() {
       currency: "KES",
     }).format(amount);
   };
+
+  const handleUpgrade = async () => {
+    setIsUpgrading(true);
+    try {
+      await api.upgradeToProTest();
+      toast({
+        title: "PRO Unlocked!",
+        description: "You now have unlimited invoices.",
+      });
+      loadStatus();
+    } catch (error) {
+      toast({
+        title: "Upgrade failed",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpgrading(false);
+    }
+  };
+
+  const isLimitReached = !userStatus.is_pro && userStatus.invoice_count >= userStatus.limit;
 
   const handleGenerate = () => {
     setShowPreview(true);
@@ -237,8 +272,9 @@ export default function Invoice() {
         description: "Invoice has been saved to your account.",
       });
 
-      // Refresh list
+      // Refresh list and status
       loadInvoices();
+      loadStatus();
 
       // 2. Generate PDF using jsPDF
       const blob = generatePDFBlob();
@@ -249,11 +285,12 @@ export default function Invoice() {
       link.click();
       URL.revokeObjectURL(url);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("PDF generation/save error:", error);
+      const message = error.message || "Failed to save invoice or generate PDF. Please try again.";
       toast({
-        title: "Error",
-        description: "Failed to save invoice or generate PDF. Please try again.",
+        title: error.message?.includes("limit") ? "Limit Reached" : "Error",
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -298,6 +335,46 @@ export default function Invoice() {
           <p className="text-muted-foreground max-w-2xl">
             Fill in the details below to generate a professional invoice for your clients.
           </p>
+        </div>
+
+        {/* Monetization Banner */}
+        <div className="mb-8 p-4 rounded-xl border bg-card/50 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className={`h-12 w-12 rounded-full flex items-center justify-center ${userStatus.is_pro ? 'bg-forest/10 text-forest' : 'bg-yellow-500/10 text-yellow-600'}`}>
+              <Sparkles className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground">
+                {userStatus.is_pro ? 'PRO Account Active' : 'MtaaBiz Free Plan'}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {userStatus.is_pro
+                  ? 'Enjoy unlimited invoice generation'
+                  : `Using ${userStatus.invoice_count} of ${userStatus.limit} free invoices`
+                }
+              </p>
+            </div>
+          </div>
+
+          {!userStatus.is_pro && (
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <div className="flex-1 md:w-48 bg-muted rounded-full h-2 overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-500 ${userStatus.invoice_count >= userStatus.limit ? 'bg-destructive' : 'bg-forest'}`}
+                  style={{ width: `${Math.min((userStatus.invoice_count / userStatus.limit) * 100, 100)}%` }}
+                />
+              </div>
+              <Button
+                variant="forest"
+                size="sm"
+                onClick={handleUpgrade}
+                disabled={isUpgrading}
+              >
+                {isUpgrading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}
+                Upgrade to PRO
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
@@ -427,9 +504,21 @@ export default function Invoice() {
               />
             </div>
 
-            <Button onClick={handleGenerate} size="lg" className="w-full" variant="forest">
-              <Sparkles className="h-5 w-5" />
-              Generate Invoice
+            <Button
+              onClick={handleGenerate}
+              size="lg"
+              className="w-full"
+              variant="forest"
+              disabled={isLimitReached}
+            >
+              {isLimitReached ? (
+                <>Limit Reached - Upgrade to PRO</>
+              ) : (
+                <>
+                  <Sparkles className="h-5 w-5 mr-2" />
+                  Generate Invoice
+                </>
+              )}
             </Button>
           </div>
 

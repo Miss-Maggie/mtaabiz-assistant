@@ -32,6 +32,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
+# SMS Gateway Configuration (Android Local IP)
+# SMS_GATEWAY_URL = 'http://192.168.0.100:8080/send'
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',

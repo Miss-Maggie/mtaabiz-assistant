@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MessageSquare, Copy, Check, Sparkles, Share2 } from "lucide-react";
+import { MessageSquare, Copy, Check, Sparkles, Share2, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { shareToWhatsApp } from "@/lib/share";
 
@@ -40,9 +40,11 @@ export default function Messages() {
   const [messageType, setMessageType] = useState<keyof typeof messageTemplates>("payment-reminder");
   const [tone, setTone] = useState<"polite" | "friendly">("polite");
   const [clientName, setClientName] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
   const [amount, setAmount] = useState("");
   const [generatedMessage, setGeneratedMessage] = useState("");
   const [copied, setCopied] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const { toast } = useToast();
 
   const handleGenerate = () => {
@@ -68,6 +70,34 @@ export default function Messages() {
       description: "Message copied to clipboard.",
     });
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSendSMS = async () => {
+    if (!clientPhone) {
+      toast({
+        title: "Phone Required",
+        description: "Please enter a phone number to send the SMS.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // setIsSending(true);
+    // try {
+    //   await api.sendSMS(clientPhone, generatedMessage);
+    //   toast({
+    //     title: "SMS Sent!",
+    //     description: `Message sent to ${clientPhone} via local gateway.`,
+    //   });
+    // } catch (error: any) {
+    //   toast({
+    //     title: "Failed to send SMS",
+    //     description: error.message || "Ensure your Android Gateway is running and same Wi-Fi.",
+    //     variant: "destructive",
+    //   });
+    // } finally {
+    //   setIsSending(false);
+    // }
   };
 
   const [savedMessages, setSavedMessages] = useState<any[]>([]);
@@ -174,6 +204,17 @@ export default function Messages() {
                 />
               </div>
 
+              <div>
+                <Label htmlFor="clientPhone" className="text-foreground">Client Phone</Label>
+                <Input
+                  id="clientPhone"
+                  placeholder="e.g., 0712345678"
+                  value={clientPhone}
+                  onChange={(e) => setClientPhone(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+
               {messageType === "payment-reminder" && (
                 <div>
                   <Label htmlFor="amount" className="text-foreground">Amount (optional)</Label>
@@ -219,6 +260,20 @@ export default function Messages() {
                     <Share2 className="h-4 w-4" />
                     WhatsApp
                   </Button>
+                  {/* <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSendSMS}
+                    disabled={isSending}
+                    className="text-forest border-forest hover:bg-forest/10"
+                  >
+                    {isSending ? (
+                      <Check className="h-4 w-4 animate-ping" />
+                    ) : (
+                      <Send className="h-4 w-4 mr-2" />
+                    )}
+                    SMS
+                  </Button> */}
                   <Button variant="outline" size="sm" onClick={handleCopy}>
                     {copied ? (
                       <Check className="h-4 w-4" />

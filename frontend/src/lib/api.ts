@@ -137,6 +137,31 @@ class ApiClient {
     });
     return this.handleResponse<MessageTemplate>(response);
   }
+
+  async sendSMS(phone: string, message: string): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/messages/send-sms/`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+      body: JSON.stringify({ phone_number: phone, message }),
+    });
+    return this.handleResponse<{ message: string }>(response);
+  }
+
+  async getUserStatus(): Promise<{ is_pro: boolean; invoice_count: number; limit: number }> {
+    const response = await fetch(`${this.baseUrl}/auth/status/`, {
+      method: 'GET',
+      headers: this.getHeaders(true),
+    });
+    return this.handleResponse<{ is_pro: boolean; invoice_count: number; limit: number }>(response);
+  }
+
+  async upgradeToProTest(): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/auth/upgrade-test/`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+    });
+    return this.handleResponse<{ message: string }>(response);
+  }
 }
 
 export const api = new ApiClient(API_BASE_URL);
