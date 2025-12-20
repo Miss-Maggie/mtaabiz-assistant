@@ -62,3 +62,8 @@ This project is built using modern web technologies to ensure a fast, responsive
    pip install -r requirements.txt
    python manage.py runserver
    ```
+4. **PRO Features (Monetization)**
+   *(For more details, refer to the Pricing section)*
+   - Unlimited Invoices (Free limit: 5)
+   - Exclusive Business Registration Templates
+   - Priority Support
