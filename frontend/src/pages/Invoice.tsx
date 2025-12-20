@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FileText, Plus, Trash2, Download, Sparkles, Loader2, Share2, History } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { useToast } from "@/hooks/use-toast";
+import { PricingModal } from "@/components/PricingModal";
 
 interface LineItem {
   id: string;
@@ -33,6 +34,7 @@ export default function Invoice() {
 
   const [userStatus, setUserStatus] = useState({ is_pro: false, invoice_count: 0, limit: 5 });
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
 
   useEffect(() => {
     loadInvoices();
@@ -323,6 +325,11 @@ export default function Invoice() {
 
   return (
     <Layout>
+      <PricingModal
+        isOpen={isPricingOpen}
+        onClose={() => setIsPricingOpen(false)}
+        onUpgradeTest={handleUpgrade}
+      />
       <div className="container py-10">
         <div className="mb-10">
           <div className="inline-flex items-center gap-2 rounded-full bg-forest-light px-4 py-2 text-sm font-medium text-forest mb-4">
@@ -367,7 +374,7 @@ export default function Invoice() {
               <Button
                 variant="forest"
                 size="sm"
-                onClick={handleUpgrade}
+                onClick={() => setIsPricingOpen(true)}
                 disabled={isUpgrading}
               >
                 {isUpgrading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Sparkles className="h-4 w-4 mr-2" />}

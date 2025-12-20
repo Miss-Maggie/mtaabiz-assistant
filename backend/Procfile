@@ -1,0 +1,1 @@
+web: gunicorn mtaabiz_backend.wsgi:application
