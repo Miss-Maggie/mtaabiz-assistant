@@ -44,7 +44,7 @@ This project is built using modern web technologies to ensure a fast, responsive
 
 1. **Clone the repository**
    ```bash
-   git clone <YOUR_GIT_URL>
+   git clone https://github.com/Miss-Maggie/mtaabiz-assistant.git
    cd mtaabiz-assistant
    ```
 
