@@ -46,7 +46,7 @@ if not CORS_ALLOWED_ORIGINS or CORS_ALLOWED_ORIGINS == ['']:
     ]
 else:
     # Filter out empty strings if any
-    CORS_ALLOWED_ORIGINS = ["https://mtaabizassistant1.vercel.app/"]
+    CORS_ALLOWED_ORIGINS = ["https://mtaabizassistant1.vercel.app"]
 
 # SMS Gateway Configuration (Android Local IP)
 # SMS_GATEWAY_URL = 'http://192.168.0.100:8080/send'
