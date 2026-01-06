@@ -66,8 +66,14 @@ class ApiClient {
     return response.json();
   }
 
+  private getUrl(endpoint: string): string {
+    const cleanBase = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl;
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    return `${cleanBase}${cleanEndpoint}`;
+  }
+
   async login(username: string, password: string): Promise<AuthResponse> {
-    const response = await fetch(`${this.baseUrl}/auth/login/`, {
+    const response = await fetch(this.getUrl('/auth/login/'), {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({ username, password }),
@@ -76,7 +82,7 @@ class ApiClient {
   }
 
   async signup(username: string, email: string, password: string): Promise<AuthResponse> {
-    const response = await fetch(`${this.baseUrl}/auth/register/`, {
+    const response = await fetch(this.getUrl('/auth/register/'), {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({ username, email, password }),
@@ -85,7 +91,7 @@ class ApiClient {
   }
 
   async logout(): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/auth/logout/`, {
+    const response = await fetch(this.getUrl('/auth/logout/'), {
       method: 'POST',
       headers: this.getHeaders(true),
     });
@@ -95,7 +101,7 @@ class ApiClient {
   }
 
   async getCurrentUser(): Promise<AuthResponse['user']> {
-    const response = await fetch(`${this.baseUrl}/auth/user/`, {
+    const response = await fetch(this.getUrl('/auth/user/'), {
       method: 'GET',
       headers: this.getHeaders(true),
     });
@@ -104,7 +110,7 @@ class ApiClient {
 
   // Invoice Endpoints
   async getInvoices(): Promise<Invoice[]> {
-    const response = await fetch(`${this.baseUrl}/invoices/`, {
+    const response = await fetch(this.getUrl('/invoices/'), {
       method: 'GET',
       headers: this.getHeaders(true),
     });
@@ -112,7 +118,7 @@ class ApiClient {
   }
 
   async createInvoice(data: Invoice): Promise<Invoice> {
-    const response = await fetch(`${this.baseUrl}/invoices/`, {
+    const response = await fetch(this.getUrl('/invoices/'), {
       method: 'POST',
       headers: this.getHeaders(true),
       body: JSON.stringify(data),
@@ -122,7 +128,7 @@ class ApiClient {
 
   // Message Endpoints
   async getMessages(): Promise<MessageTemplate[]> {
-    const response = await fetch(`${this.baseUrl}/messages/`, {
+    const response = await fetch(this.getUrl('/messages/'), {
       method: 'GET',
       headers: this.getHeaders(true),
     });
@@ -130,7 +136,7 @@ class ApiClient {
   }
 
   async createMessage(data: MessageTemplate): Promise<MessageTemplate> {
-    const response = await fetch(`${this.baseUrl}/messages/`, {
+    const response = await fetch(this.getUrl('/messages/'), {
       method: 'POST',
       headers: this.getHeaders(true),
       body: JSON.stringify(data),
@@ -139,7 +145,7 @@ class ApiClient {
   }
 
   async sendSMS(phone: string, message: string): Promise<{ message: string }> {
-    const response = await fetch(`${this.baseUrl}/messages/send-sms/`, {
+    const response = await fetch(this.getUrl('/messages/send-sms/'), {
       method: 'POST',
       headers: this.getHeaders(true),
       body: JSON.stringify({ phone_number: phone, message }),
@@ -148,7 +154,7 @@ class ApiClient {
   }
 
   async getUserStatus(): Promise<{ is_pro: boolean; invoice_count: number; limit: number }> {
-    const response = await fetch(`${this.baseUrl}/auth/status/`, {
+    const response = await fetch(this.getUrl('/auth/status/'), {
       method: 'GET',
       headers: this.getHeaders(true),
     });
@@ -156,7 +162,7 @@ class ApiClient {
   }
 
   async upgradeToProTest(): Promise<{ message: string }> {
-    const response = await fetch(`${this.baseUrl}/auth/upgrade-test/`, {
+    const response = await fetch(this.getUrl('/auth/upgrade-test/'), {
       method: 'POST',
       headers: this.getHeaders(true),
     });
