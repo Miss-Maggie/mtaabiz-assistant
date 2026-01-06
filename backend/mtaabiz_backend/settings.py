@@ -31,26 +31,20 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-l!%iy4+ik!y__7!g*#t7u15!ko
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1 localhost mtaabiz-assistant.onrender.com').split(' ')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1 localhost mtaabiz-assistant.onrender.com .onrender.com').split(' ')
 ALLOWED_HOSTS = [host for host in ALLOWED_HOSTS if host]
 
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(' ')
-CORS_ALLOWED_ORIGINS = [origin for origin in CORS_ALLOWED_ORIGINS if origin]
+CORS_ALLOW_ALL_ORIGINS = True  # Enable this to resolve PERSISTENT CORS issues
+CORS_ALLOW_CREDENTIALS = True
 
-# Default origins for development and production
-if not CORS_ALLOWED_ORIGINS:
-    CORS_ALLOWED_ORIGINS = [
-        "http://localhost:8080",
-        "http://localhost:5173",
-        "http://127.0.0.1:8080",
-        "http://127.0.0.1:5173",
-        "https://mtaabizassistant1.vercel.app",
-    ]
-
-CSRF_TRUSTED_ORIGINS = [origin for origin in CORS_ALLOWED_ORIGINS if origin.startswith('https://')]
+CSRF_TRUSTED_ORIGINS = [
+    "https://mtaabizassistant1.vercel.app",
+    "https://mtaabiz-assistant.onrender.com"
+]
 
 # This is required for Render to properly handle HTTPS
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False # Render handles redirection at the load balancer level
 
 # SMS Gateway Configuration (Android Local IP)
 # SMS_GATEWAY_URL = 'http://192.168.0.100:8080/send'
