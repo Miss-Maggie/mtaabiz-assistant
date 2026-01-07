@@ -79,9 +79,10 @@ export default function Signup() {
       });
       navigate('/login');
     } catch (error) {
+      console.error('Signup error:', error);
       toast({
         title: 'Signup failed',
-        description: error instanceof Error ? error.message : 'Could not create account',
+        description: error instanceof Error ? error.message : 'Could not create account. Please check your internet connection or try again later.',
         variant: 'destructive',
       });
     } finally {

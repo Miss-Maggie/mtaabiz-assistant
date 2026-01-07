@@ -39,7 +39,13 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://mtaabizassistant1.vercel.app",
-    "https://mtaabiz-assistant.onrender.com"
+    "https://mtaabiz-assistant.onrender.com",
+    "https://*.vercel.app" # Broaden for Vercel preview deployments
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://mtaabizassistant1.vercel.app",
+    "https://mtaabiz-assistant.onrender.com",
 ]
 
 # This is required for Render to properly handle HTTPS

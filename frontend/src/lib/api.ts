@@ -56,11 +56,17 @@ class ApiClient {
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const error: ApiError = await response.json().catch(() => ({}));
+      console.error('API Response Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        error
+      });
       const message =
         error.detail ||
         error.non_field_errors?.[0] ||
-        Object.values(error).flat().join(', ') ||
-        'An error occurred';
+        Object.values(error).flat().map(v => typeof v === 'string' ? v : JSON.stringify(v)).join(', ') ||
+        `Error ${response.status}: ${response.statusText}`;
       throw new Error(message);
     }
     return response.json();
